@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 func main() {
@@ -18,7 +19,7 @@ func main() {
 	defer resp.Body.Close()
 	data, err := ioutil.ReadAll(resp.Body)
 	value := gjson.Get(string(data), "files.kubeconfig.raw_url")
-	fmt.Printf("%+v",value)
+	fmt.Println("Downloading kubeconfig content from url")
 	r, err := http.Get(value.Str)
 	if err != nil {
 		panic(err)
@@ -28,12 +29,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	ioutil.WriteFile(viper.GetString("SyncFilePath"), result, os.ModePerm)
+	err = ioutil.WriteFile(viper.GetString("SyncFilePath"), result, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Done")
 }
 
 func setupConfig() {
+	homeDir, _ := os.UserHomeDir()
 	viper.SetConfigType("yaml")
-	viper.SetConfigFile("/Users/akash/.gist-sync/config")
+	viper.SetConfigFile(filepath.Join(homeDir,".gist-sync/config"))
 	err := viper.ReadInConfig();
 	if err != nil {
 		panic(err)
