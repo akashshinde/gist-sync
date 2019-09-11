@@ -19,7 +19,7 @@ func main() {
 	defer resp.Body.Close()
 	data, err := ioutil.ReadAll(resp.Body)
 	value := gjson.Get(string(data), "files.kubeconfig.raw_url")
-	fmt.Println("Downloading kubeconfig content from url")
+	fmt.Println("Downloading kubeconfig content from url.")
 	r, err := http.Get(value.Str)
 	if err != nil {
 		panic(err)
